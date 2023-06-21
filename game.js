@@ -1,44 +1,47 @@
 var gamePattern = [];
 var roundPatternInd = 0;
 var levelCount = 1;
-var gameInProgress = false;
-var roundInProgress = false;
+var gameStarted = false;
 
-$(document).keypress(function(e) {
-    if (!gameInProgress) {
-        startGame(e);
-        gameInProgress = true;
-    }
+$(document).keypress(function (e) {
+    if (!gameStarted) startGame(e);
 });
 
 function startGame(e) {
-    $("#level-title").text("Level " + levelCount);
+    gameStarted = true;
     gamePattern = [];
     levelCount = 1;
     addBtnToPattern();
-    console.log(gamePattern);
-}
-
-function currentRound(queue, levelCount) {
-
+    $("#level-title").text("Level " + levelCount);
 }
 
 $(".btn").click(function (e) {
+    if (!gameStarted) {
+        return;
+    }
+
     var nextOrder = gamePattern[roundPatternInd]
-    var clickedButton = btnClicked(e, levelCount);
-    if (clickedButton === nextOrder) {
-        roundPatternInd += 1;
-        levelCount += 1;
-        addBtnToPattern();
-        $("#level-title").text("Level " + levelCount);
-    } else {
+    var clickedButton = btnClicked(e);
+    if (clickedButton !== nextOrder) {
         $("#level-title").text("Game Over, Press Any Key to Restart");
         $("body").addClass("game-over");
-        setTimeout(function() {
+        playSound("wrong");
+        setTimeout(function () {
             $("body").removeClass("game-over");
         }, 250);
         roundPatternInd = 0;
-        gameInProgress = false; 
+        gameStarted = false;
+        return;
+    }
+
+    roundPatternInd += 1;
+    if (roundPatternInd === gamePattern.length) {
+        setTimeout(function () {
+            addBtnToPattern();
+        }, 1000);
+        roundPatternInd = 0;
+        levelCount += 1;
+        $("#level-title").text("Level " + levelCount);
     }
 });
 
@@ -46,26 +49,28 @@ function addBtnToPattern() {
     var btnColors = ['green', 'red', 'yellow', 'blue'];
     var ind = Math.floor(Math.random() * 4);
     var btnAdded = btnColors[ind];
+    playSound(btnAdded);
+
     $("#" + btnAdded).addClass("pressed");
-    setTimeout(function() {
+    setTimeout(function () {
         $("#" + btnAdded).removeClass("pressed");
     }, 75);
     gamePattern.push(btnAdded);
     console.log(gamePattern);
 }
 
-function btnClicked(e, count) {
-    var idBtnPressed = "#" + e.target.id;
+function btnClicked(e) {
+    var color = e.target.id;
+    var idBtnPressed = "#" + color;
+    playSound(color);
     $(idBtnPressed).addClass("pressed");
-    setTimeout(function() {
+    setTimeout(function () {
         $(idBtnPressed).removeClass("pressed");
     }, 75);
     return e.target.id;
 }
 
-
-// need a way to keep track of the current level (increment the level if a successful click has been made)
-
-// need a way to highlight the new square randomly each round
-
-// need a way to verify the squares clicked are in the correct order
+function playSound(name) {
+    var sound = new Audio("./sounds/" + name + ".mp3");
+    sound.play();
+}
