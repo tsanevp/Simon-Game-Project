@@ -25,7 +25,14 @@
     
 ### Screenshot
 
+#### Starting Screen
 <img width="1920" alt="personal-website1" src="https://github.com/tsanevp/Simon-Game-Project/blob/main/assets/images/simon-game-screenshot.png">
+
+#### Game In-Progress
+<img width="1920" alt="personal-website1" src="https://github.com/tsanevp/Simon-Game-Project/blob/main/assets/images/simon-game-in-progress.png">
+
+#### Game Lost
+<img width="1920" alt="personal-website1" src="https://github.com/tsanevp/Simon-Game-Project/blob/main/assets/images/simon-game-gameover.png">
 
 ### Links
 
