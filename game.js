@@ -97,6 +97,6 @@ function clickedBtn(color) {
 
 // Plays the sound of the button clicked
 function playSound(name) {
-    var sound = new Audio("./sounds/" + name + ".mp3");
+    var sound = new Audio("./assets/sounds/" + name + ".mp3");
     sound.play();
 }
