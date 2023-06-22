@@ -2,21 +2,14 @@ var gamePattern = [];
 var roundPatternInd = 0;
 var levelCount = 1;
 var gameStarted = false;
+var roundStarted = false;
 
-$(document).keypress(function (e) {
-    if (!gameStarted) startGame(e);
+$(document).keypress(function () {
+    if (!gameStarted) startGame();
 });
 
-function startGame(e) {
-    gameStarted = true;
-    gamePattern = [];
-    levelCount = 1;
-    addBtnToPattern();
-    $("#level-title").text("Level " + levelCount);
-}
-
 $(".btn").click(function (e) {
-    if (!gameStarted) {
+    if (!gameStarted || roundStarted) {
         return;
     }
 
@@ -24,11 +17,13 @@ $(".btn").click(function (e) {
     var clickedButton = btnClicked(e);
     if (clickedButton !== nextOrder) {
         $("#level-title").text("Game Over, Press Any Key to Restart");
-        $("body").addClass("game-over");
         playSound("wrong");
+
+        $("body").addClass("game-over");
         setTimeout(function () {
             $("body").removeClass("game-over");
         }, 250);
+
         roundPatternInd = 0;
         gameStarted = false;
         return;
@@ -36,38 +31,60 @@ $(".btn").click(function (e) {
 
     roundPatternInd += 1;
     if (roundPatternInd === gamePattern.length) {
+        roundStarted = true;
         setTimeout(function () {
             addBtnToPattern();
         }, 1000);
+
         roundPatternInd = 0;
         levelCount += 1;
         $("#level-title").text("Level " + levelCount);
     }
 });
 
+function startGame() {
+    gameStarted = true;
+    gamePattern = [];
+    levelCount = 1;
+
+    addBtnToPattern();
+    $("#level-title").text("Level " + levelCount);
+}
+
 function addBtnToPattern() {
     var btnColors = ['green', 'red', 'yellow', 'blue'];
     var ind = Math.floor(Math.random() * 4);
     var btnAdded = btnColors[ind];
-    playSound(btnAdded);
-
-    $("#" + btnAdded).addClass("pressed");
-    setTimeout(function () {
-        $("#" + btnAdded).removeClass("pressed");
-    }, 75);
+    
     gamePattern.push(btnAdded);
-    console.log(gamePattern);
+    displayPattern();
 }
 
-function btnClicked(e) {
-    var color = e.target.id;
-    var idBtnPressed = "#" + color;
+const timer = ms => new Promise(res => setTimeout(res, ms));
+
+async function displayPattern() {
+    for (var i = 0; i < gamePattern.length; i++) {
+        var curr = gamePattern[i];
+        console.log(curr + " " + i);
+        playBtn(curr);
+        await timer(500);
+    }
+    roundStarted = false;
+}
+
+function btnClicked(event) {
+    var color = event.target.id;
+    playBtn(color);
+    return color;
+}
+
+function playBtn(color) {
     playSound(color);
-    $(idBtnPressed).addClass("pressed");
+
+    $("#" + color).addClass("pressed");
     setTimeout(function () {
-        $(idBtnPressed).removeClass("pressed");
+        $("#" + color).removeClass("pressed");
     }, 75);
-    return e.target.id;
 }
 
 function playSound(name) {
